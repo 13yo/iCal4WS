@@ -17,16 +17,16 @@ object Event {
       (json \ "title").as[String],
       (json \ "description").as[String],
       (json \ "tags").asOpt[Seq[String]].getOrElse(List()),
-      new Date((json \ "start").as[Long] * 1000),
-      new Date((json \ "end").as[Long] * 1000))
+      new Date((json \ "start").as[Int] * 1000),
+      new Date((json \ "end").as[Int] * 1000))
 
     def writes(e: Event): JsValue = JsObject(Seq(
       "id" -> JsString(e.id),
       "title" -> JsString(e.title),
       "description" -> JsString(e.description),
       "tags" -> JsArray(e.tags.map(x => JsString(x.trim)).toList),
-      "start" -> JsString((e.start.getTime() / 1000).toString),
-      "end" -> JsString((e.end.getTime() / 1000).toString)))
+      "start" -> JsNumber((e.start.getTime() / 1000)),
+      "end" -> JsNumber((e.end.getTime() / 1000))))
   }
 
   implicit def str2date(dString: String): Date = {
