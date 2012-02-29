@@ -7,23 +7,25 @@ import net.fortuna.ical4j.model.Property
 import net.fortuna.ical4j.model.component.VEvent
 import net.fortuna.ical4j.model.property.DateProperty
 
-case class Event(title: String, description: String, tags: Seq[String], start: Date, end: Date)
+case class Event(id: String, title: String, description: String, tags: Seq[String], start: Date, end: Date)
 
 object Event {
 
   implicit object EventFormat extends Format[Event] {
     def reads(json: JsValue): Event = Event(
+      (json \ "id").as[String],
       (json \ "title").as[String],
       (json \ "description").as[String],
       (json \ "tags").asOpt[Seq[String]].getOrElse(List()),
-      new Date((json \ "begin").as[Long]),
+      new Date((json \ "start").as[Long]),
       new Date((json \ "end").as[Long]))
 
     def writes(e: Event): JsValue = JsObject(Seq(
+      "id" -> JsString(e.id),
       "title" -> JsString(e.title),
       "description" -> JsString(e.description),
       "tags" -> JsArray(e.tags.map(x => JsString(x.trim)).toList),
-      "begin" -> JsString(e.start.getTime().toString),
+      "start" -> JsString(e.start.getTime().toString),
       "end" -> JsString(e.end.getTime().toString)))
   }
 
@@ -41,11 +43,12 @@ object Event {
       case _    => p.getValue()
     }
 
+    val id = vs(event.getUid())
     val title = vs(event.getSummary())
     val description = vs(event.getDescription())
     val tags = vs(event.getProperty(Property.CATEGORIES)).replaceAll("\\\\,", ",").split(",")
     val begin = vd(event.getStartDate())
     val end = vd(event.getEndDate())
-    Event(title, description, tags, begin, end)
+    Event(id, title, description, tags, begin, end)
   }
 }
