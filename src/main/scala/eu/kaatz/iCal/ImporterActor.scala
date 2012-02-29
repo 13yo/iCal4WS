@@ -54,7 +54,7 @@ class ImporterActor extends Actor {
   private def eventsSource() = {
     val url = new URL("http://webmail.kaatz-media.de/kronolith/ics.php?c=egroupware%40kaatz-media.de")
     val conn = url.openConnection()
-    val login = new StringBuffer("egroupware@kaatz-media.de").append(":").append("Z3t1O2-5j8").toString();
+    val login = new StringBuffer("egroupware@kaatz-media.de").append(":").append("aZ3Ug!TLZ^iG").toString();
     val base = login.getBytes();
     val authorizationString = "Basic " + new String(new sun.misc.BASE64Encoder().encode(base));
     conn.setRequestProperty("Authorization", authorizationString);

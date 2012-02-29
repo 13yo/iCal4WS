@@ -20,7 +20,7 @@ object App extends Application {
   //Akka
   private val system = ActorSystem("fegCal")
   private lazy val eventActor = system.actorOf(Props[ImporterActor])
-  implicit val timeout = Timeout(1000 milliseconds)
+  implicit val timeout = Timeout(3000 milliseconds)
 
   def route = {
     case GET(Path("/")) => Action {
