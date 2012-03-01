@@ -10,6 +10,7 @@ import net.fortuna.ical4j.data.CalendarBuilder
 import net.fortuna.ical4j.model.Calendar
 import net.fortuna.ical4j.model.component.VEvent
 import java.net.URL
+import scala.io.Codec
 
 class ImporterActor extends Actor {
   var es: List[Event] = List.empty
@@ -58,9 +59,7 @@ class ImporterActor extends Actor {
     val base = login.getBytes();
     val authorizationString = "Basic " + new String(new sun.misc.BASE64Encoder().encode(base));
     conn.setRequestProperty("Authorization", authorizationString);
-    Source.fromInputStream(conn.getInputStream())
-
-    //    Source.fromFile("src/main/resources/test.ics")
+    Source.fromInputStream(conn.getInputStream())(Codec.UTF8)
   }
 }
 
