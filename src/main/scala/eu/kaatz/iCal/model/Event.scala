@@ -23,7 +23,11 @@ object Event {
     def writes(e: Event): JsValue = JsObject(Seq(
       "id" -> JsString(e.id),
       "title" -> JsString(e.title),
-      "description" -> JsString(e.description),
+      "url" -> JsString(new StringBuffer().append("javascript:openDialog('").
+        append(e.title).
+        append("','").
+        append(e.description).
+        append("'").toString),
       "tags" -> JsArray(e.tags.map(x => JsString(x.trim)).toList),
       "start" -> JsNumber((e.start.getTime() / 1000)),
       "end" -> JsNumber((e.end.getTime() / 1000))))
