@@ -27,7 +27,7 @@ object Event {
         append(e.title).
         append("','").
         append(e.description).
-        append("'").toString),
+        append("')").toString),
       "tags" -> JsArray(e.tags.map(x => JsString(x.trim)).toList),
       "start" -> JsNumber((e.start.getTime() / 1000)),
       "end" -> JsNumber((e.end.getTime() / 1000))))
