@@ -39,6 +39,10 @@ class ImporterActor extends Actor {
 
   private def events(now: Date) = {
     val md5 = calcMD5(eventsSource.getLines().foldLeft("") { _ + _ })
+    println(now.getTime - updateDate.getTime)
+    println(eventsMD5)
+    println(md5)
+    println((now.getTime - updateDate.getTime) < 30000 && eventsMD5.equals(md5))
     if ((now.getTime - updateDate.getTime) < 30000 && eventsMD5.equals(md5))
       es
     else {
