@@ -6,6 +6,12 @@ import net.fortuna.ical4j.model.Component
 import net.fortuna.ical4j.model.Property
 import net.fortuna.ical4j.model.component.VEvent
 import net.fortuna.ical4j.model.property.DateProperty
+import net.fortuna.ical4j.model.ComponentFactory
+import net.fortuna.ical4j.model.property.RRule
+import org.joda.time.DateTime
+import org.scala_tools.time.Imports._
+import net.fortuna.ical4j.model.parameter.Value
+import scala.collection.JavaConversions
 
 case class Event(id: String, title: String, description: String, tags: Seq[String], start: Date, end: Date)
 
@@ -45,6 +51,23 @@ object Event {
     def vs(p: Property) = p match {
       case null => ""
       case _    => p.getValue()
+    }
+    val rrule = event.getProperty(Property.RRULE).asInstanceOf[RRule]
+    if (rrule != null) {
+      val begin = new net.fortuna.ical4j.model.Date((DateTime.now - 1.month).toDate)
+      val end = new net.fortuna.ical4j.model.Date((DateTime.now + 1.year).toDate)
+      //      JavaConversions.asBuffer(rrule.getRecur().getDates(begin, end, Value.DATE_TIME)).collect({ case d: net.fortuna.ical4j.model.DateTime => 
+      //        val copy = event.copy()
+      //        val pList = copy.getProperties()
+      //        copy.getProperty(Property.)
+      //        copy.calculateRecurrenceSet()
+      //        pList.remove(Property.RRULE)
+      //        pList.getProperty(Property.DTSTART).setValue(d.)
+      //        pList.getProperty(Property.DTEND).setValue()
+      //      })
+
+    } else {
+
     }
 
     val id = vs(event.getUid())

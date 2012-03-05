@@ -23,7 +23,7 @@ class ImporterActor extends Actor {
   }
 
   private def getAllEvents(now: Date) = {
-    events(now)
+    events(now)(0)
   }
 
   private def getTagFilteredEvents(tag: String, now: Date) = {
