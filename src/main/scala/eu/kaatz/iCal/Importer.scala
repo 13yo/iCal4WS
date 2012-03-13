@@ -8,7 +8,6 @@ import java.net.URL
 import scala.io.Codec
 import net.fortuna.ical4j.model.Component
 import scala.collection.mutable.ListBuffer
-import play.api.libs.json._
 import scala.collection.mutable.Buffer
 import eu.kaatz.iCal.model.Event
 import net.fortuna.ical4j.model.component.VEvent
@@ -17,11 +16,12 @@ import java.util.ArrayList
 import net.fortuna.ical4j.model.Property
 import net.fortuna.ical4j.model.Recur
 import net.fortuna.ical4j.model.property.RRule
-import org.joda.time.DateTime
 import org.scala_tools.time.Imports._
 import net.fortuna.ical4j.model.Date
 import net.fortuna.ical4j.model.parameter.Value
 import net.fortuna.ical4j.model.Period
+import net.fortuna.ical4j.model.component.VEventFactory
+import net.fortuna.ical4j.model.ComponentFactory
 object Importer extends Application {
   def calcMD5(l: List[String], s: String): String = l match {
     case Nil =>
@@ -52,19 +52,24 @@ object Importer extends Application {
   val calendar: Calendar = builder.build(reader)
 
   val b: Buffer[Component] = scala.collection.JavaConversions.asBuffer(calendar.getComponents().asInstanceOf[ArrayList[Component]])
-  b.foreach { x =>
-    val p = x.getProperty(Property.RRULE)
+  b.foreach { event =>
+    val p = event.getProperty(Property.RRULE)
     if (p != null) {
       println(p.asInstanceOf[RRule].getRecur())
       val r: Recur = p.asInstanceOf[RRule].getRecur()
       val begin = new Date((DateTime.now - 1.month).toDate)
       val end = new Date((DateTime.now + 1.year).toDate)
-      val period = new Period(new net.fortuna.ical4j.model.DateTime(x.getProperty(Property.DTSTART).getValue()), new net.fortuna.ical4j.model.DateTime(x.getProperty(Property.DTEND).getValue()))
-      val dateIt = r.getDates(begin, end, Value.DATE_TIME).iterator()
+      val period = new Period(new net.fortuna.ical4j.model.DateTime(event.getProperty(Property.DTSTART).getValue()), new net.fortuna.ical4j.model.DateTime(event.getProperty(Property.DTEND).getValue()))
+      val dateIt = r.getDates(begin, end, Value.DATE_TIME).iterator
       while (dateIt.hasNext()) {
         val d = dateIt.next().asInstanceOf[net.fortuna.ical4j.model.DateTime]
         val per = new Period(d, period.getDuration())
-        println(per.getEnd())
+        val eProps = event.getProperties()
+        eProps.getProperty(Property.DTSTART).setValue(per.getStart().toString())
+        eProps.getProperty(Property.DTEND).setValue(per.getEnd().toString())
+        eProps.remove(eProps.getProperty(Property.RRULE))
+        val eNew = ComponentFactory.getInstance().createComponent(Component.VEVENT, eProps)
+        println(eNew)
       }
     }
   }

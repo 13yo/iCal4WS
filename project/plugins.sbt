@@ -1,4 +1,6 @@
-addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.7.3")
+libraryDependencies <+= sbtVersion(v => "com.github.siasia" %% "xsbt-web-plugin" % (v+"-0.2.10")) // moved to repo1
+// for the older version of the plugin, use the following instead:
+// you will need to change jetty's scope from 'container' to 'jetty' above
+//libraryDependencies <+= sbtVersion(v => "com.github.siasia" %% "xsbt-web-plugin" % ("0.1.0-"+v))
 
-resolvers += Resolver.url("sbt-plugin-releases",
-  new URL("http://scalasbt.artifactoryonline.com/scalasbt/sbt-plugin-releases/"))(Resolver.ivyStylePatterns)
+addSbtPlugin("com.typesafe.sbteclipse" % "sbteclipse-plugin" % "2.0.0")

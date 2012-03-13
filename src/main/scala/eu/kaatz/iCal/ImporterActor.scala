@@ -1,6 +1,7 @@
 package eu.kaatz.iCal
 
 import akka.actor.Actor
+import eu.kaatz.iCal.model.EventImplicits
 import eu.kaatz.iCal.model.Event
 import java.security.MessageDigest
 import java.util.Date
@@ -11,9 +12,10 @@ import net.fortuna.ical4j.model.Calendar
 import net.fortuna.ical4j.model.component.VEvent
 import java.net.URL
 import scala.io.Codec
+import scala.collection.mutable.ListBuffer
 
-class ImporterActor extends Actor {
-  var es: List[Event] = List.empty
+class ImporterActor extends Actor with EventImplicits {
+  var es = ListBuffer[Event]()
   var eventsMD5 = ""
   var updateDate = new Date(0)
 
@@ -23,7 +25,8 @@ class ImporterActor extends Actor {
   }
 
   private def getAllEvents(now: Date) = {
-    events(now)(0)
+    //    println(events(now))
+    events(now)
   }
 
   private def getTagFilteredEvents(tag: String, now: Date) = {
@@ -39,20 +42,28 @@ class ImporterActor extends Actor {
 
   private def events(now: Date) = {
     val md5 = calcMD5(eventsSource.getLines().foldLeft("") { _ + _ })
-    println(now.getTime - updateDate.getTime)
-    println(eventsMD5)
-    println(md5)
-    println((now.getTime - updateDate.getTime) < 30000 && eventsMD5.equals(md5))
+    //    println(now.getTime - updateDate.getTime)
+    //    println(eventsMD5)
+    //    println(md5)
+    //    println((now.getTime - updateDate.getTime) < 30000 && eventsMD5.equals(md5))
     if ((now.getTime - updateDate.getTime) < 30000 && eventsMD5.equals(md5))
-      es
+      es.toList
     else {
       val reader: UnfoldingReader = new UnfoldingReader(eventsSource.reader(), 3000);
       val builder: CalendarBuilder = new CalendarBuilder()
       val calendar: Calendar = builder.build(reader)
-      es = scala.collection.JavaConversions.asBuffer(calendar.getComponents()).collect({ case e: VEvent => Event.fromVEvent(e) }).toList
+
+      es.clear()
+      val componentIt = calendar.getComponents().iterator()
+      while (componentIt.hasNext())
+        componentIt.next() match {
+          case e: VEvent => es ++= e
+          case _         =>
+        }
+
       updateDate = new Date()
       eventsMD5 = md5
-      es
+      es.toList
     }
   }
 
