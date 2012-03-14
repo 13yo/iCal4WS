@@ -1,8 +1,10 @@
 name := "iCal4WS"
  
 scalaVersion := "2.9.1"
- 
-seq(webSettings: _*)
+
+seq(webSettings ++ Seq(
+	port in container.Configuration := 9000
+) : _*)
 
 // using 0.2.4+ of the sbt web plugin
 scanDirectories in Compile := Nil
