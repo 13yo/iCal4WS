@@ -82,5 +82,8 @@ trait EventImplicits {
     ("tags", JArray(e.tags.map(x => JString(x.trim)).toList)) ~
     ("start", (e.start.getTime() / 1000)) ~
     ("end", (e.end.getTime() / 1000))
-  implicit def EList2Json(l: List[Event]) = JArray(l map { Event2Json(_) })
+  implicit def EList2Json(l: List[Event]) = l match {
+    case Nil => JNothing
+    case _   => JArray(l map { Event2Json(_) })
+  }
 }

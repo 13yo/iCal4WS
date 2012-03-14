@@ -36,11 +36,9 @@ object App extends RestHelper with EventImplicits {
     case "events" :: "tag" :: tag :: _ JsonGet _ =>
       RestContinuation.async(
         satisfyRequest => {
-          val events = (eventActor ? TaggedEvents(tag, new Date())).mapTo[List[Event]].map { es =>
-            es.asInstanceOf[JValue]
-          }
+          val events = (eventActor ? TaggedEvents(tag, new Date())).mapTo[List[Event]]
           events onComplete {
-            case Right(result) => satisfyRequest(result)
+            case Right(result) => satisfyRequest(EList2Json(result))
             case Left(failure) => println(failure)
           }
         })
