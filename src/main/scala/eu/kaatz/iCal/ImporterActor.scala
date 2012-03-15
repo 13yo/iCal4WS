@@ -69,7 +69,7 @@ class ImporterActor extends Actor with EventImplicits {
         componentIt.next() match {
           case e: VEvent =>
             //es ++= e
-            eMap = eMap ++ VEvent2Events(e).map { event => (event.id -> event) }
+            eMap = eMap ++ VEvent2Events(e).map { event => ((event.id + event.start) -> event) }
           case _ =>
         }
 
