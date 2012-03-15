@@ -14,6 +14,7 @@ import net.liftweb.json.JsonAST._
 import net.liftweb.json.JsonDSL._
 import net.fortuna.ical4j.model.Recur
 import scala.collection.mutable.ListBuffer
+import java.net.URLEncoder
 
 case class Event(id: String, title: String, description: String, tags: Seq[String], start: Date, end: Date)
 
@@ -77,6 +78,6 @@ trait EventImplicits {
   implicit def Event2Json(e: Event): JObject = ("id", e.id) ~ ("title", e.title) ~ ("description", e.description) ~
     ("tags", JArray(e.tags.map(x => JString(x.trim)).toList)) ~
     ("start", (e.start.getTime() / 1000)) ~
-    ("end", (e.end.getTime() / 1000))
+    ("end", (e.end.getTime() / 1000)) ~ ("url", URLEncoder.encode(e.id + e.start))
   implicit def EList2Json(l: List[Event]) = JArray(l map { Event2Json(_) })
 }
