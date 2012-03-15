@@ -82,7 +82,7 @@ trait EventImplicits {
     append(e.description).
     append("')").toString) ~
     ("tags", JArray(e.tags.map(x => JString(x.trim)).toList)) ~
-    ("start", e.start.toString()) ~
-    ("end", e.end.toString())
+    ("start", e.start.toGMTString()) ~
+    ("end", e.end.toGMTString())
   implicit def EList2Json(l: List[Event]) = JArray(l map { Event2Json(_) })
 }
