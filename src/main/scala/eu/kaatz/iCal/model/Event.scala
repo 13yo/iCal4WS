@@ -36,6 +36,8 @@ object Event {
       val title = vs(e.getSummary())
       val description = vs(e.getDescription())
       val tags = vs(e.getProperty(Property.CATEGORIES)).replaceAll("\\\\,", ",").split(",")
+      val dStart = e.getStartDate()
+      val dEnd = e.getEndDate()
       val begin = vd(e.getStartDate())
       val end = vd(e.getEndDate())
       Event(id, title, description, tags, begin, end)
@@ -80,7 +82,7 @@ trait EventImplicits {
     append(e.description).
     append("')").toString) ~
     ("tags", JArray(e.tags.map(x => JString(x.trim)).toList)) ~
-    ("start", (e.start.getTime() / 1000)) ~
-    ("end", (e.end.getTime() / 1000))
+    ("start", e.start.toString()) ~
+    ("end", e.end.toString())
   implicit def EList2Json(l: List[Event]) = JArray(l map { Event2Json(_) })
 }

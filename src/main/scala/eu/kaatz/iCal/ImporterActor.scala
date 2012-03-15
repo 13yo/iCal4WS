@@ -13,20 +13,28 @@ import net.fortuna.ical4j.model.component.VEvent
 import java.net.URL
 import scala.io.Codec
 import scala.collection.mutable.ListBuffer
+import scala.collection.immutable.TreeMap
 
 class ImporterActor extends Actor with EventImplicits {
   var es = ListBuffer[Event]()
+  var eMap = TreeMap[String, Event]().empty
   var eventsMD5 = ""
   var updateDate = new Date(0)
 
   def receive = {
     case AllEvents(now)       => sender ! getAllEvents(now)
     case TaggedEvents(t, now) => sender ! getTagFilteredEvents(t, now)
+    case OneEvent(id)         => sender ! getEvent(id)
   }
 
   private def getAllEvents(now: Date) = {
     //    println(events(now))
     events(now)
+  }
+
+  private def getEvent(id: String) = {
+    //    println(events(now))
+    eMap(id)
   }
 
   private def getTagFilteredEvents(tag: String, now: Date) = {
@@ -47,23 +55,28 @@ class ImporterActor extends Actor with EventImplicits {
     //    println(md5)
     //    println((now.getTime - updateDate.getTime) < 30000 && eventsMD5.equals(md5))
     if ((now.getTime - updateDate.getTime) < 30000 && eventsMD5.equals(md5))
-      es.toList
+      //es.toList
+      eMap.values.toList
     else {
       val reader: UnfoldingReader = new UnfoldingReader(eventsSource.reader(), 3000);
       val builder: CalendarBuilder = new CalendarBuilder()
       val calendar: Calendar = builder.build(reader)
 
-      es.clear()
+      //es.clear
+      eMap = eMap.empty
       val componentIt = calendar.getComponents().iterator()
       while (componentIt.hasNext())
         componentIt.next() match {
-          case e: VEvent => es ++= e
-          case _         =>
+          case e: VEvent =>
+            //es ++= e
+            eMap = eMap ++ VEvent2Events(e).map { event => (event.id -> event) }
+          case _ =>
         }
 
       updateDate = new Date()
       eventsMD5 = md5
-      es.toList
+      //      es.toList
+      eMap.values.toList
     }
   }
 
@@ -79,4 +92,5 @@ class ImporterActor extends Actor with EventImplicits {
 }
 
 case class AllEvents(now: Date)
+case class OneEvent(id: String)
 case class TaggedEvents(tag: String, now: Date)

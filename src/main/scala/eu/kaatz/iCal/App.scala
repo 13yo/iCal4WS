@@ -42,5 +42,14 @@ object App extends RestHelper with EventImplicits {
             case Left(failure) => println(failure)
           }
         })
+    case "events" :: id :: _ JsonGet _ =>
+      RestContinuation.async(
+        satisfyRequest => {
+          val event = (eventActor ? OneEvent(id)).mapTo[Event]
+          event onComplete {
+            case Right(result) => satisfyRequest(Event2Json(result))
+            case Left(failure) => println(failure)
+          }
+        })
   }
 }
