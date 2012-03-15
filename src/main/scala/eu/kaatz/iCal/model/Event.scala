@@ -74,11 +74,7 @@ trait EventImplicits {
 
   implicit def VEvent2Events(e: VEvent): TraversableOnce[Event] = Event.fromVEvent(e)
   implicit def Json2Event(s: String) = parse(s).extract[Event]
-  implicit def Event2Json(e: Event): JObject = ("id", e.id) ~ ("title", e.title) ~ ("url", new StringBuffer().append("javascript:openDialog('").
-    append(e.title).
-    append("','").
-    append(e.description).
-    append("')").toString) ~
+  implicit def Event2Json(e: Event): JObject = ("id", e.id) ~ ("title", e.title) ~ ("description", e.description) ~
     ("tags", JArray(e.tags.map(x => JString(x.trim)).toList)) ~
     ("start", (e.start.getTime() / 1000)) ~
     ("end", (e.end.getTime() / 1000))
