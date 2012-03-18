@@ -38,5 +38,6 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "0.9.26" % "compile->default", // Logging
   "org.mnode.ical4j" % "ical4j" % "1.0.3",
   "org.scala-tools.time" % "time_2.9.1" % "0.5",
-  "com.typesafe.akka" % "akka-actor" % "2.0"
+  "com.typesafe.akka" % "akka-actor" % "2.0",
+  "org.clapper" %% "markwrap" % "0.5.3"
 )
