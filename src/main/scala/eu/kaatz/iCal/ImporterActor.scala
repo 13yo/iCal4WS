@@ -50,7 +50,7 @@ class ImporterActor extends Actor with EventImplicits {
 
    private def events(now : Date) = {
       val md5 = calcMD5(eventsSource.getLines().foldLeft("") { _ + _ })
-      eventsSource.getLines().foreach(println)
+      //eventsSource.getLines().foreach(println)
       //    println(now.getTime - updateDate.getTime)
       //    println(eventsMD5)
       //    println(md5)
