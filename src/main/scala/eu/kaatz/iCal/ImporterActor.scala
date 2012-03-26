@@ -40,7 +40,6 @@ class ImporterActor extends Actor with EventImplicits {
   private def getTagFilteredEvents(tags: List[String], now: Date) = {
     events(now).collect({ case x: Event if !(x.tags.intersect(tags).isEmpty) => x })
   }
-
   private def calcMD5(s: String): String = {
     val md5 = MessageDigest.getInstance("MD5")
     md5.reset()
@@ -50,6 +49,7 @@ class ImporterActor extends Actor with EventImplicits {
 
   private def events(now: Date) = {
     val md5 = calcMD5(eventsSource.getLines().foldLeft("") { _ + _ })
+    //eventsSource.getLines().foreach(println)
     //    println(now.getTime - updateDate.getTime)
     //    println(eventsMD5)
     //    println(md5)
