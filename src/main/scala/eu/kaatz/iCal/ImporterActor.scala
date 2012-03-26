@@ -22,9 +22,9 @@ class ImporterActor extends Actor with EventImplicits {
   var updateDate = new Date(0)
 
   def receive = {
-    case AllEvents(now)       => sender ! getAllEvents(now)
-    case TaggedEvents(t, now) => sender ! getTagFilteredEvents(t, now)
-    case OneEvent(id)         => sender ! getEvent(id)
+    case AllEvents(now)        => sender ! getAllEvents(now)
+    case TaggedEvents(ts, now) => sender ! getTagFilteredEvents(ts, now)
+    case OneEvent(id)          => sender ! getEvent(id)
   }
 
   private def getAllEvents(now: Date) = {
@@ -37,8 +37,8 @@ class ImporterActor extends Actor with EventImplicits {
     eMap(id)
   }
 
-  private def getTagFilteredEvents(tag: String, now: Date) = {
-    events(now).collect({ case x: Event if x.tags.contains(tag) => x })
+  private def getTagFilteredEvents(tags: List[String], now: Date) = {
+    events(now).collect({ case x: Event if !(x.tags.intersect(tags).isEmpty) => x })
   }
 
   private def calcMD5(s: String): String = {
@@ -93,4 +93,4 @@ class ImporterActor extends Actor with EventImplicits {
 
 case class AllEvents(now: Date)
 case class OneEvent(id: String)
-case class TaggedEvents(tag: String, now: Date)
+case class TaggedEvents(tags: List[String], now: Date)
