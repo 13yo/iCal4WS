@@ -13,11 +13,7 @@ import net.liftweb.json.JsonAST.JValue
 import net.liftweb.json.JsonAST.JArray
 import net.liftweb.http.S
 
-/**
- * this application is registered via Global
- */
 object App extends RestHelper with EventImplicits {
-  private final val TagsPattern = """/tag/(\w+)""".r
   //Akka
   private val system = ActorSystem("fegCal")
   private lazy val eventActor = system.actorOf(Props[ImporterActor])
@@ -25,6 +21,7 @@ object App extends RestHelper with EventImplicits {
 
   serve {
     case "events" :: Nil JsonGet _ =>
+      val baseURL = S.hostAndPath + "/events/"
       val tagFilter = S.params("tag")
       if (tagFilter.isEmpty)
         // serve the URL /events
@@ -32,7 +29,7 @@ object App extends RestHelper with EventImplicits {
           satisfyRequest => {
             val events = (eventActor ? AllEvents(new Date())).mapTo[List[Event]]
             events onComplete {
-              case Right(result) => satisfyRequest(EList2Json(result))
+              case Right(result) => satisfyRequest(EList2Json(result, baseURL))
               case Left(failure) => failure.printStackTrace()
             }
           })
@@ -42,17 +39,18 @@ object App extends RestHelper with EventImplicits {
           satisfyRequest => {
             val events = (eventActor ? TaggedEvents(tagFilter, new Date())).mapTo[List[Event]]
             events onComplete {
-              case Right(result) => satisfyRequest(EList2Json(result))
+              case Right(result) => satisfyRequest(EList2Json(result, baseURL))
               case Left(failure) => println(failure)
             }
           })
     // serve the URL /events/:id
     case "events" :: id :: _ JsonGet _ =>
+      val baseURL = S.hostAndPath + "/events/"
       RestContinuation.async(
         satisfyRequest => {
           val event = (eventActor ? OneEvent(id)).mapTo[Event]
           event onComplete {
-            case Right(result) => satisfyRequest(Event2Json(result))
+            case Right(result) => satisfyRequest(Event2Json(result, baseURL))
             case Left(failure) => println(failure)
           }
         })
